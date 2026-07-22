@@ -91,9 +91,9 @@ downloadForm.addEventListener('submit', async (e) => {
         videoUrlInput.value = '';
         videoUrlInput.focus();
 
-        await triggerDownload(`${BACKEND_URL}/api/download/${encodeURIComponent(data.filename)}`);
-
         resetDownloadButton();
+
+        await triggerDownload(`${BACKEND_URL}/api/download/${encodeURIComponent(data.filename)}`);
 
     } catch (error) {
         const friendlyMessage = 'Unable to download this link right now. Please try another video.';
