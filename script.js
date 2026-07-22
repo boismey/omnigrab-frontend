@@ -74,24 +74,18 @@ downloadForm.addEventListener('submit', async (e) => {
             throw new Error(data.error || 'Failed to extract media. Please check the link.');
         }
 
-        statusBox.textContent = 'Extraction complete. Starting download...';
-        statusBox.classList.remove('hidden', 'error');
-        statusBox.classList.add('success');
-
         triggerDownload(`${BACKEND_URL}/api/download/${encodeURIComponent(data.filename)}`);
 
         videoUrlInput.value = '';
         videoUrlInput.focus();
 
         setTimeout(() => {
-            statusBox.classList.add('hidden');
-            statusBox.classList.remove('success');
-            statusBox.textContent = '';
             resetDownloadButton();
-        }, 3500);
+        }, 300);
 
     } catch (error) {
-        statusBox.textContent = error.message;
+        const friendlyMessage = 'Unable to download this link right now. Please try another video.';
+        statusBox.textContent = friendlyMessage;
         statusBox.classList.remove('hidden', 'success');
         statusBox.classList.add('error');
     } finally {
