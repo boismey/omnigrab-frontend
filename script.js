@@ -18,30 +18,25 @@ function resetDownloadButton() {
     submitBtn.textContent = 'Download';
 }
 
-function triggerDownload(downloadUrl) {
-    return new Promise((resolve) => {
-        const iframe = document.createElement('iframe');
-        iframe.src = downloadUrl;
-        iframe.style.display = 'none';
-        iframe.style.width = '0';
-        iframe.style.height = '0';
-        iframe.setAttribute('aria-hidden', 'true');
-        iframe.setAttribute('loading', 'eager');
+async function triggerDownload(downloadUrl) {
+    const response = await fetch(downloadUrl, { cache: 'no-store' });
 
-        iframe.onload = () => {
-            setTimeout(() => {
-                iframe.remove();
-                resolve();
-            }, 300);
-        };
+    if (!response.ok) {
+        throw new Error('Download failed');
+    }
 
-        iframe.onerror = () => {
-            iframe.remove();
-            resolve();
-        };
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = objectUrl;
+    link.download = 'download';
+    link.style.display = 'none';
 
-        document.body.appendChild(iframe);
-    });
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
 }
 
 // --- PASTE BUTTON LOGIC ---
