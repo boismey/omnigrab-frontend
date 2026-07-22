@@ -88,12 +88,12 @@ downloadForm.addEventListener('submit', async (e) => {
             throw new Error(data.error || 'Failed to extract media. Please check the link.');
         }
 
-        await triggerDownload(`${BACKEND_URL}/api/download/${encodeURIComponent(data.filename)}`);
-
         videoUrlInput.value = '';
         videoUrlInput.focus();
+
+        await triggerDownload(`${BACKEND_URL}/api/download/${encodeURIComponent(data.filename)}`);
+
         resetDownloadButton();
-        submitBtn.classList.remove('is-loading');
 
     } catch (error) {
         const friendlyMessage = 'Unable to download this link right now. Please try another video.';
@@ -101,6 +101,7 @@ downloadForm.addEventListener('submit', async (e) => {
         statusBox.classList.remove('hidden', 'success');
         statusBox.classList.add('error');
         resetDownloadButton();
+        videoUrlInput.focus();
     }
 });
 
