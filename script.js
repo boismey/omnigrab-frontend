@@ -26,16 +26,22 @@ pasteBtn.addEventListener('click', async () => {
 // --- DOWNLOAD LOGIC (Two-Step Architecture) ---
 downloadForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const urlInput = videoUrlInput.value;
-    
+    const urlInput = videoUrlInput.value.trim();
+
+    if (!urlInput) {
+        statusBox.textContent = 'Please enter a video URL.';
+        statusBox.className = 'error';
+        return;
+    }
+
     submitBtn.disabled = true;
-    submitBtn.classList.add('is-loading'); 
-    
+    submitBtn.classList.add('is-loading');
+    submitBtn.textContent = 'Processing...';
+
     statusBox.className = 'hidden';
     statusBox.textContent = '';
 
     try {
-        // STEP 1: Ask backend to extract the video
         const prepareEndpoint = 'https://omnigrab-api.onrender.com/api/prepare';
         const response = await fetch(prepareEndpoint, {
             method: 'POST',
@@ -49,37 +55,36 @@ downloadForm.addEventListener('submit', async (e) => {
             throw new Error(data.error || 'Failed to extract media. Please check the link.');
         }
 
-        // STEP 2: Trigger native download
         statusBox.textContent = 'Extraction complete. Starting download...';
         statusBox.className = 'success';
-        
-        // Use an invisible link to force the browser to save the file
+
         const downloadLink = document.createElement('a');
         downloadLink.href = `https://omnigrab-api.onrender.com/api/download/${encodeURIComponent(data.filename)}`;
         downloadLink.setAttribute('download', '');
         downloadLink.style.display = 'none';
-        
-        // Append it, click it, and remove it instantly
+
         document.body.appendChild(downloadLink);
         downloadLink.click();
         downloadLink.remove();
 
-        // --- NEW UX FEATURE: Clear the form ---
-        // Empty the search bar for the next link
         videoUrlInput.value = '';
-        
-        // Hide the success message after 4 seconds so the UI looks clean again
+        videoUrlInput.focus();
+
         setTimeout(() => {
             statusBox.classList.add('hidden');
             statusBox.textContent = '';
+            submitBtn.textContent = 'Download';
         }, 4000);
-        
+
     } catch (error) {
         statusBox.textContent = error.message;
         statusBox.className = 'error';
     } finally {
         submitBtn.disabled = false;
         submitBtn.classList.remove('is-loading');
+        if (!statusBox.textContent) {
+            submitBtn.textContent = 'Download';
+        }
     }
 });
 
