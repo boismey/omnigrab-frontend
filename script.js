@@ -11,6 +11,7 @@ const modalTitle = document.getElementById('modalTitle');
 const modalBody = document.getElementById('modalBody');
 
 const BACKEND_URL = 'https://omnigrab-api.onrender.com';
+const APP_VERSION = '2026-07-23';
 
 function resetDownloadButton() {
     submitBtn.disabled = false;
@@ -19,7 +20,10 @@ function resetDownloadButton() {
 }
 
 async function triggerDownload(downloadUrl) {
-    const response = await fetch(downloadUrl, { cache: 'no-store' });
+    const response = await fetch(downloadUrl, {
+        cache: 'no-store',
+        credentials: 'omit'
+    });
 
     if (!response.ok) {
         throw new Error('Download failed');
@@ -31,6 +35,7 @@ async function triggerDownload(downloadUrl) {
     link.href = objectUrl;
     link.download = 'download';
     link.style.display = 'none';
+    link.rel = 'noopener';
 
     document.body.appendChild(link);
     link.click();
@@ -80,7 +85,9 @@ downloadForm.addEventListener('submit', async (e) => {
         const response = await fetch(prepareEndpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url: urlInput })
+            body: JSON.stringify({ url: urlInput }),
+            cache: 'no-store',
+            credentials: 'omit'
         });
 
         const data = await response.json();
