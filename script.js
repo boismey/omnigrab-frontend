@@ -26,13 +26,21 @@ function triggerDownload(downloadUrl) {
         iframe.style.width = '0';
         iframe.style.height = '0';
         iframe.setAttribute('aria-hidden', 'true');
+        iframe.setAttribute('loading', 'eager');
 
-        document.body.appendChild(iframe);
+        iframe.onload = () => {
+            setTimeout(() => {
+                iframe.remove();
+                resolve();
+            }, 300);
+        };
 
-        setTimeout(() => {
+        iframe.onerror = () => {
             iframe.remove();
             resolve();
-        }, 1500);
+        };
+
+        document.body.appendChild(iframe);
     });
 }
 
@@ -85,6 +93,7 @@ downloadForm.addEventListener('submit', async (e) => {
         videoUrlInput.value = '';
         videoUrlInput.focus();
         resetDownloadButton();
+        submitBtn.classList.remove('is-loading');
 
     } catch (error) {
         const friendlyMessage = 'Unable to download this link right now. Please try another video.';
