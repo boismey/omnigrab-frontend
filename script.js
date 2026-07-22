@@ -19,29 +19,18 @@ function resetDownloadButton() {
     submitBtn.textContent = 'Download';
 }
 
-async function triggerDownload(downloadUrl) {
-    const response = await fetch(downloadUrl, {
-        cache: 'no-store',
-        credentials: 'omit'
-    });
-
-    if (!response.ok) {
-        throw new Error('Download failed');
-    }
-
-    const blob = await response.blob();
-    const objectUrl = URL.createObjectURL(blob);
+// --- FIXED: Direct Native Download ---
+function triggerDownload(downloadUrl) {
+    // By creating a direct link, the browser handles the download natively.
+    // This uses zero RAM and preserves the correct filename from the backend.
     const link = document.createElement('a');
-    link.href = objectUrl;
-    link.download = 'download';
+    link.href = downloadUrl;
+    link.setAttribute('download', ''); 
     link.style.display = 'none';
-    link.rel = 'noopener';
-
+    
     document.body.appendChild(link);
     link.click();
     link.remove();
-
-    setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
 }
 
 // --- PASTE BUTTON LOGIC ---
@@ -96,12 +85,14 @@ downloadForm.addEventListener('submit', async (e) => {
             throw new Error(data.error || 'Failed to extract media. Please check the link.');
         }
 
+        // Clear input for the next download
         videoUrlInput.value = '';
         videoUrlInput.focus();
 
         startNewRequest();
 
-        await triggerDownload(`${BACKEND_URL}/api/download/${encodeURIComponent(data.filename)}`);
+        // Trigger the memory-safe download
+        triggerDownload(`${BACKEND_URL}/api/download/${encodeURIComponent(data.filename)}`);
 
     } catch (error) {
         const friendlyMessage = 'Unable to download this link right now. Please try another video.';
