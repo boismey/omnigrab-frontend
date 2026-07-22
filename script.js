@@ -74,6 +74,12 @@ downloadForm.addEventListener('submit', async (e) => {
     statusBox.classList.add('hidden');
     statusBox.textContent = '';
 
+    const startNewRequest = () => {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('is-loading');
+        submitBtn.textContent = 'Download';
+    };
+
     try {
         const prepareEndpoint = `${BACKEND_URL}/api/prepare`;
         const response = await fetch(prepareEndpoint, {
@@ -91,7 +97,7 @@ downloadForm.addEventListener('submit', async (e) => {
         videoUrlInput.value = '';
         videoUrlInput.focus();
 
-        resetDownloadButton();
+        startNewRequest();
 
         await triggerDownload(`${BACKEND_URL}/api/download/${encodeURIComponent(data.filename)}`);
 
@@ -100,7 +106,7 @@ downloadForm.addEventListener('submit', async (e) => {
         statusBox.textContent = friendlyMessage;
         statusBox.classList.remove('hidden', 'success');
         statusBox.classList.add('error');
-        resetDownloadButton();
+        startNewRequest();
         videoUrlInput.focus();
     }
 });
