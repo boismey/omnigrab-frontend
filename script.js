@@ -36,7 +36,7 @@ downloadForm.addEventListener('submit', async (e) => {
 
     try {
         // STEP 1: Ask backend to extract the video
-        const prepareEndpoint = `${BACKEND_URL}/api/prepare`;
+        const prepareEndpoint = 'https://omnigrab-api.onrender.com/api/prepare';
         const response = await fetch(prepareEndpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -55,7 +55,7 @@ downloadForm.addEventListener('submit', async (e) => {
         
         // Use an invisible link to force the browser to save the file
         const downloadLink = document.createElement('a');
-        downloadLink.href = `${BACKEND_URL}/api/download/${encodeURIComponent(data.filename)}`;
+        downloadLink.href = `https://omnigrab-api.onrender.com/api/download/${encodeURIComponent(data.filename)}`;
         downloadLink.setAttribute('download', '');
         downloadLink.style.display = 'none';
         
