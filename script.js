@@ -19,15 +19,19 @@ function resetDownloadButton() {
 }
 
 function triggerDownload(downloadUrl) {
-    const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    link.style.display = 'none';
+    return new Promise((resolve) => {
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.style.display = 'none';
 
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        setTimeout(resolve, 100);
+    });
 }
 
 // --- PASTE BUTTON LOGIC ---
@@ -74,24 +78,18 @@ downloadForm.addEventListener('submit', async (e) => {
             throw new Error(data.error || 'Failed to extract media. Please check the link.');
         }
 
-        triggerDownload(`${BACKEND_URL}/api/download/${encodeURIComponent(data.filename)}`);
+        await triggerDownload(`${BACKEND_URL}/api/download/${encodeURIComponent(data.filename)}`);
 
         videoUrlInput.value = '';
         videoUrlInput.focus();
-
-        setTimeout(() => {
-            resetDownloadButton();
-        }, 300);
+        resetDownloadButton();
 
     } catch (error) {
         const friendlyMessage = 'Unable to download this link right now. Please try another video.';
         statusBox.textContent = friendlyMessage;
         statusBox.classList.remove('hidden', 'success');
         statusBox.classList.add('error');
-    } finally {
-        if (statusBox.classList.contains('error')) {
-            resetDownloadButton();
-        }
+        resetDownloadButton();
     }
 });
 
