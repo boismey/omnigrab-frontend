@@ -20,17 +20,19 @@ function resetDownloadButton() {
 
 function triggerDownload(downloadUrl) {
     return new Promise((resolve) => {
-        const link = document.createElement('a');
-        link.href = downloadUrl;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.style.display = 'none';
+        const iframe = document.createElement('iframe');
+        iframe.src = downloadUrl;
+        iframe.style.display = 'none';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.setAttribute('aria-hidden', 'true');
 
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
+        document.body.appendChild(iframe);
 
-        setTimeout(resolve, 100);
+        setTimeout(() => {
+            iframe.remove();
+            resolve();
+        }, 1500);
     });
 }
 
