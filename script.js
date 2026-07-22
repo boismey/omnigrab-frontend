@@ -12,6 +12,24 @@ const modalBody = document.getElementById('modalBody');
 
 const BACKEND_URL = 'https://omnigrab-api.onrender.com';
 
+function resetDownloadButton() {
+    submitBtn.disabled = false;
+    submitBtn.classList.remove('is-loading');
+    submitBtn.textContent = 'Download';
+}
+
+function triggerDownload(downloadUrl) {
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.style.display = 'none';
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+}
+
 // --- PASTE BUTTON LOGIC ---
 pasteBtn.addEventListener('click', async () => {
     try {
@@ -42,7 +60,7 @@ downloadForm.addEventListener('submit', async (e) => {
     statusBox.textContent = '';
 
     try {
-        const prepareEndpoint = 'https://omnigrab-api.onrender.com/api/prepare';
+        const prepareEndpoint = `${BACKEND_URL}/api/prepare`;
         const response = await fetch(prepareEndpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -58,14 +76,7 @@ downloadForm.addEventListener('submit', async (e) => {
         statusBox.textContent = 'Extraction complete. Starting download...';
         statusBox.className = 'success';
 
-        const downloadLink = document.createElement('a');
-        downloadLink.href = `https://omnigrab-api.onrender.com/api/download/${encodeURIComponent(data.filename)}`;
-        downloadLink.setAttribute('download', '');
-        downloadLink.style.display = 'none';
-
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        downloadLink.remove();
+        triggerDownload(`${BACKEND_URL}/api/download/${encodeURIComponent(data.filename)}`);
 
         videoUrlInput.value = '';
         videoUrlInput.focus();
@@ -73,18 +84,14 @@ downloadForm.addEventListener('submit', async (e) => {
         setTimeout(() => {
             statusBox.classList.add('hidden');
             statusBox.textContent = '';
-            submitBtn.textContent = 'Download';
+            resetDownloadButton();
         }, 4000);
 
     } catch (error) {
         statusBox.textContent = error.message;
         statusBox.className = 'error';
     } finally {
-        submitBtn.disabled = false;
-        submitBtn.classList.remove('is-loading');
-        if (!statusBox.textContent) {
-            submitBtn.textContent = 'Download';
-        }
+        resetDownloadButton();
     }
 });
 
