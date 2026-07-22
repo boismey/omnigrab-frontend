@@ -56,7 +56,8 @@ downloadForm.addEventListener('submit', async (e) => {
     submitBtn.classList.add('is-loading');
     submitBtn.textContent = 'Processing...';
 
-    statusBox.className = 'hidden';
+    statusBox.classList.remove('success', 'error');
+    statusBox.classList.add('hidden');
     statusBox.textContent = '';
 
     try {
@@ -74,7 +75,8 @@ downloadForm.addEventListener('submit', async (e) => {
         }
 
         statusBox.textContent = 'Extraction complete. Starting download...';
-        statusBox.className = 'success';
+        statusBox.classList.remove('hidden', 'error');
+        statusBox.classList.add('success');
 
         triggerDownload(`${BACKEND_URL}/api/download/${encodeURIComponent(data.filename)}`);
 
@@ -83,15 +85,19 @@ downloadForm.addEventListener('submit', async (e) => {
 
         setTimeout(() => {
             statusBox.classList.add('hidden');
+            statusBox.classList.remove('success');
             statusBox.textContent = '';
             resetDownloadButton();
-        }, 4000);
+        }, 3500);
 
     } catch (error) {
         statusBox.textContent = error.message;
-        statusBox.className = 'error';
+        statusBox.classList.remove('hidden', 'success');
+        statusBox.classList.add('error');
     } finally {
-        resetDownloadButton();
+        if (statusBox.classList.contains('error')) {
+            resetDownloadButton();
+        }
     }
 });
 
