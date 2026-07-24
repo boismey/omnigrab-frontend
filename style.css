@@ -273,7 +273,6 @@ button.is-loading .spinner { display: block; }
     padding: 2rem;
     transform: translateY(0);
     transition: transform 0.3s ease;
-    border-radius: 20px !important; 
 }
 .modal-overlay.hidden .modal-box {
     transform: translateY(20px);
@@ -329,22 +328,17 @@ button.is-loading .spinner { display: block; }
     .container {
         padding: 2rem 1rem;
     }
-    
-    /* Shrink the giant text */
     .hero h1 {
         font-size: 2.2rem;
     }
     .hero p {
         font-size: 0.95rem;
     }
-    
-    /* Change the main card from a pill to a rectangle */
     .glass-card {
         border-radius: 24px;
         padding: 1.5rem 1rem;
     }
     
-    /* Stack the search bar elements on top of each other */
     .search-bar {
         flex-direction: column;
         border-radius: 16px;
@@ -354,7 +348,12 @@ button.is-loading .spinner { display: block; }
         box-shadow: none;
     }
     
-    /* Style the new input wrapper */
+    /* NEW: Remove focus ring from main wrapper on mobile */
+    .search-bar:focus-within {
+        border-color: transparent;
+        box-shadow: none;
+    }
+    
     .input-wrapper {
         background: rgba(15, 23, 42, 0.4);
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -362,24 +361,19 @@ button.is-loading .spinner { display: block; }
         margin-bottom: 0.75rem;
         transition: border-color 0.3s ease;
     }
-    
     .input-wrapper:focus-within {
         border-color: #38bdf8;
         box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
     }
-    
     .search-bar input {
         padding: 1rem;
         font-size: 1rem;
     }
-    
-    /* Make the button full width */
     button[type="submit"] {
         width: 100%;
         border-radius: 12px;
         height: 54px;
     }
-    
     .footer {
         padding: 1.5rem 1rem;
     }

@@ -19,10 +19,7 @@ function resetDownloadButton() {
     submitBtn.textContent = 'Download';
 }
 
-// --- FIXED: Direct Native Download ---
 function triggerDownload(downloadUrl) {
-    // By creating a direct link, the browser handles the download natively.
-    // This uses zero RAM and preserves the correct filename from the backend.
     const link = document.createElement('a');
     link.href = downloadUrl;
     link.setAttribute('download', ''); 
@@ -33,7 +30,6 @@ function triggerDownload(downloadUrl) {
     link.remove();
 }
 
-// --- PASTE BUTTON LOGIC ---
 pasteBtn.addEventListener('click', async () => {
     try {
         const text = await navigator.clipboard.readText();
@@ -44,7 +40,6 @@ pasteBtn.addEventListener('click', async () => {
     }
 });
 
-// --- DOWNLOAD LOGIC (Two-Step Architecture) ---
 downloadForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const urlInput = videoUrlInput.value.trim();
@@ -63,12 +58,6 @@ downloadForm.addEventListener('submit', async (e) => {
     statusBox.classList.add('hidden');
     statusBox.textContent = '';
 
-    const startNewRequest = () => {
-        submitBtn.disabled = false;
-        submitBtn.classList.remove('is-loading');
-        submitBtn.textContent = 'Download';
-    };
-
     try {
         const prepareEndpoint = `${BACKEND_URL}/api/prepare`;
         const response = await fetch(prepareEndpoint, {
@@ -85,26 +74,26 @@ downloadForm.addEventListener('submit', async (e) => {
             throw new Error(data.error || 'Failed to extract media. Please check the link.');
         }
 
-        // Clear input for the next download
-        videoUrlInput.value = '';
-        videoUrlInput.focus();
-
-        startNewRequest();
-
-        // Trigger the memory-safe download
+        submitBtn.textContent = 'Starting Download...';
         triggerDownload(`${BACKEND_URL}/api/download/${encodeURIComponent(data.filename)}`);
+        videoUrlInput.value = '';
+
+        setTimeout(() => {
+            resetDownloadButton(); 
+            statusBox.textContent = 'Download started! Check your browser downloads.';
+            statusBox.className = 'success';
+            statusBox.classList.remove('hidden');
+        }, 3000);
 
     } catch (error) {
-        const friendlyMessage = 'Unable to download this link right now. Please try another video.';
-        statusBox.textContent = friendlyMessage;
-        statusBox.classList.remove('hidden', 'success');
-        statusBox.classList.add('error');
-        startNewRequest();
+        statusBox.textContent = error.message || 'Unable to download this link right now.';
+        statusBox.className = 'error';
+        statusBox.classList.remove('hidden');
+        resetDownloadButton();
         videoUrlInput.focus();
     }
 });
 
-// --- MODAL & POLICY LOGIC ---
 const policyContent = {
     tos: {
         title: "Terms of Service",
@@ -151,7 +140,6 @@ const policyContent = {
     }
 };
 
-// Open modal
 document.querySelectorAll('.footer-links a').forEach(link => {
     link.addEventListener('click', (e) => {
         e.preventDefault(); 
@@ -164,12 +152,10 @@ document.querySelectorAll('.footer-links a').forEach(link => {
     });
 });
 
-// Close modal via X button
 closeModalBtn.addEventListener('click', () => {
     policyModal.classList.add('hidden');
 });
 
-// Close modal by clicking outside
 policyModal.addEventListener('click', (e) => {
     if (e.target === policyModal) {
         policyModal.classList.add('hidden');
